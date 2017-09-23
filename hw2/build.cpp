@@ -1,5 +1,5 @@
 #include "build.h"
-#include <iostream>
+//#include <iostream>
 
 int build(int w, int e, const vector<Bridge> & bridges)
 {
@@ -22,15 +22,16 @@ vector<vector<Bridge>> BridgeBuilder::buildSubset()
   for(auto i = 0; i < bridges.size(); i++)
   {
     vector<int> prevEdges;
-    subsets = addVecs(subsets, buildSubsetRecurse(i, prevEdges));
+    subsets = addVecs(subsets, buildSubsetRecurse(i, i, prevEdges));
   }
   return subsets;
 }
 
-vector<vector<Bridge>> BridgeBuilder::buildSubsetRecurse(int edgeIdx, const vector<int> & prevEdges)
+vector<vector<Bridge>> BridgeBuilder::buildSubsetRecurse(int edgeIdx, int startEdge, const vector<int> & prevEdges)
 {
   vector<vector<Bridge>> subset;
   vector<Bridge> set;
+  Bridge lastEdge;
   vector<int> tempEdges = prevEdges;
   bool bridgeFail = false;
 
@@ -40,23 +41,38 @@ vector<vector<Bridge>> BridgeBuilder::buildSubsetRecurse(int edgeIdx, const vect
     if(bridgesOverlap(bridges[edgeIdx], bridges[p]))
     {
       bridgeFail = true;
-      break;
+//      break;
     }
   }
 
-  subset.push_back(set);
+  if(!bridgeFail)
+    lastEdge = bridges[edgeIdx];
 
-  if(!bridgeFail && (edgeIdx+1) < bridges.size())
+int prev = edgeIdx;
+  ++edgeIdx;
+  if(edgeIdx==bridges.size())
+    edgeIdx = 0;
+
+  if(edgeIdx != startEdge && edgeIdx < bridges.size())
   {
-    //add one without edge
-    subset = addVecs(subset, buildSubsetRecurse(edgeIdx+1, prevEdges));
-    //add one with
-    tempEdges.push_back(edgeIdx);
-    subset = addVecs(subset, buildSubsetRecurse(edgeIdx+1, tempEdges));
+    if(!bridgeFail)
+    {
+      subset.push_back(set);
+      //add one without edge
+      subset = addVecs(subset, buildSubsetRecurse(edgeIdx, startEdge, prevEdges));
+      //add one with
+      tempEdges.push_back(prev);//edgeIdx);
+      subset = addVecs(subset, buildSubsetRecurse(edgeIdx, startEdge,tempEdges));
+    }
+    else  //just add one without
+      subset = addVecs(subset, buildSubsetRecurse(edgeIdx, startEdge, prevEdges));
   }
-  else if((edgeIdx+1) < bridges.size()) //just add one without
-    subset = addVecs(subset, buildSubsetRecurse(edgeIdx+1, prevEdges));
-
+  else
+  {
+    if(lastEdge.size()>0)
+      set.push_back(lastEdge);
+    subset.push_back(set);
+  }
   return subset;
 
 }

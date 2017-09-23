@@ -13,7 +13,7 @@ class BridgeBuilder
   int westCount, eastCount;
 
   vector<vector<Bridge>> buildSubset();
-  vector<vector<Bridge>> buildSubsetRecurse(int edgeIdx, const vector<int> & prevEdges);
+  vector<vector<Bridge>> buildSubsetRecurse(int edgeIdx, int startEdge, const vector<int> & prevEdges);
   bool bridgesOverlap(const Bridge & a, const Bridge & b);
   int getMaxToll(vector<vector<Bridge>> & subsets);
 
