@@ -1,5 +1,5 @@
 #include "build.h"
-//#include <iostream>
+
 
 int build(int w, int e, const vector<Bridge> & bridges)
 {
@@ -18,7 +18,7 @@ vector<vector<Bridge>> addVecs(const vector<vector<Bridge>> & a, const vector<ve
 
 vector<vector<Bridge>> BridgeBuilder::buildSubset()
 {
-  vector<vector<Bridge>> subsets;// = new vector<vector<Bridge>>();
+  vector<vector<Bridge>> subsets;
   for(auto i = 0; i < bridges.size(); i++)
   {
     vector<int> prevEdges;
@@ -32,6 +32,7 @@ vector<vector<Bridge>> BridgeBuilder::buildSubsetRecurse(int edgeIdx, int startE
   vector<vector<Bridge>> subset;
   vector<Bridge> set;
   Bridge lastEdge;
+  int prev = edgeIdx;
   vector<int> tempEdges = prevEdges;
   bool bridgeFail = false;
 
@@ -41,19 +42,19 @@ vector<vector<Bridge>> BridgeBuilder::buildSubsetRecurse(int edgeIdx, int startE
     if(bridgesOverlap(bridges[edgeIdx], bridges[p]))
     {
       bridgeFail = true;
-//      break;
+      break;
     }
   }
 
   if(!bridgeFail)
     lastEdge = bridges[edgeIdx];
 
-int prev = edgeIdx;
+
   ++edgeIdx;
   if(edgeIdx==bridges.size())
     edgeIdx = 0;
 
-  if(edgeIdx != startEdge && edgeIdx < bridges.size())
+  if(edgeIdx != startEdge)
   {
     if(!bridgeFail)
     {
