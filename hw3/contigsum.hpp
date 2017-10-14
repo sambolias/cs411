@@ -1,11 +1,19 @@
 #pragma once
 
-#include<vector>
-using std::vector;
 #include<iterator>
-using std::iterator_traits;
-#include<iostream>
-using std::cout;
+using std::advance;
+using std::distance;
+#include<algorithm>
+using std::max;
+
+
+struct seqValues
+{
+  int gcs;
+  int gcsLt;
+  int gcsRt;
+  int sum;
+};
 
 template<typename RAIter>
 int contigSum(RAIter first, RAIter last);
@@ -14,53 +22,78 @@ template<typename RAIter>
 int sumOfSequence(RAIter first, RAIter last);
 
 template<typename RAIter>
-int contigSumRecurse(RAIter first, RAIter last);
+seqValues contigSumRecurse(RAIter first, RAIter last);
 
 template<typename RAIter>
 int contigSum(RAIter first, RAIter last)
 {
+  seqValues gcs = contigSumRecurse(first, last);
+  if(gcs.gcs<0)
+    gcs.gcs=0;
 
-  int gcs = contigSumRecurse(first, last);
-  if(gcs<0)
-    gcs=0;
-
-    cout<<gcs<<"\n";
-  return gcs;
+  return gcs.gcs;
 }
 
 template<typename RAIter>
-int contigSumRecurse(RAIter first, RAIter last)
+seqValues contigSumRecurse(RAIter first, RAIter last)
 {
-  if(first+1==last)
-    return *first;
+  //base cases
+  if(first==last)
+  {
+    seqValues mt;
+    mt.gcs=0;
+    return mt;
+  }
 
-  auto mid = first + (last-first)/2;
+  if(distance(first,last)==1)
+  {
+    seqValues base;
+    base.gcs = *first;
+    base.gcsLt = (*first > 0)? *first : 0;
+    base.gcsRt = (*first > 0)? *first : 0;
+    base.sum = *first;
 
-  int b = 0;
-  int c = 0;
-  int d = sumOfSequence(first, last);
-  if(first != mid )
-    b = contigSumRecurse(first, mid);
-  if(last != mid)
-    c = contigSumRecurse(mid, last);
+    return base;
+  }
 
+  //divide
+  auto mid = first;
+  advance(mid, distance(first, last)/2);
 
+  seqValues left, right, seq;
+  //recursive calls
+  left = contigSumRecurse(first, mid);
+  right = contigSumRecurse(mid, last);
 
-  int a=0;
+  //conquer
+  //this sum calc
+  seq.sum=sumOfSequence(first,last);
 
-  if(d>b && d>c)
-    a=d;
-  else if(b>d && b>c)
-    a=b;
-  else if(c>b && c>d)
-    a=c;
+  //this gcsLt calc
+  int maximum=left.gcsLt;
+  if(left.sum+right.gcsLt > maximum)
+    maximum=left.sum+right.gcsLt;
+  if(maximum<0)
+    maximum=0;
+  seq.gcsLt=maximum;
 
-  // if(b+c > a)
-  //   if(b>c)
-  //     a=contigSumRecurse(first, last-1);
-  //   else
-  //     a=contigSumRecurse(first+1, last);
-  return a;
+  //this gcsRt calc
+  maximum=right.gcsRt;
+  if(right.sum+left.gcsRt > maximum)
+    maximum=right.sum+left.gcsRt;
+  if(maximum<0)
+    maximum=0;
+  seq.gcsRt=maximum;
+
+  //this gcs calc
+  maximum=max(seq.gcsLt, seq.gcsRt);        //from lt or rt side
+  maximum=max(maximum, left.gcs);            // or lt division
+  maximum=max(maximum, right.gcs);            // or rt division
+  maximum=max(maximum, seq.sum);               // or sum
+  maximum=max(maximum, left.gcsRt+right.gcsLt); // or middle
+  seq.gcs=maximum;
+
+  return seq;
 }
 
 template<typename RAIter>
@@ -71,6 +104,5 @@ int sumOfSequence(RAIter first, RAIter last)
   {
     sum += *i;
   }
-  //cout<<sum<<"\n";
   return sum;
 }
