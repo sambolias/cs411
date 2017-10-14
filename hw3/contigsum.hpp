@@ -1,5 +1,17 @@
 #pragma once
-
+/*
+	contigsum.hpp
+	Sam Erie
+	serie@alaska.edu
+  10/14/17
+	CS 411
+	HW 3
+	Divide & Conquer Algorithm Demo
+	Calculates the greatest contiguous sum from a sequence
+  of ints. Uses the recursive divide and conquer algorithm
+  described in the hw3 specifications.
+  Passes all tests of contigsum_test.cpp
+*/
 #include<iterator>
 using std::advance;
 using std::distance;
@@ -7,13 +19,7 @@ using std::distance;
 using std::max;
 
 
-struct seqValues
-{
-  int gcs;
-  int gcsLt;
-  int gcsRt;
-  int sum;
-};
+struct seqValues;
 
 template<typename RAIter>
 int contigSum(RAIter first, RAIter last);
@@ -23,6 +29,16 @@ int sumOfSequence(RAIter first, RAIter last);
 
 template<typename RAIter>
 seqValues contigSumRecurse(RAIter first, RAIter last);
+
+// struct to hold ABCD values from specification
+struct seqValues
+{
+  int gcs;
+  int gcsLt;
+  int gcsRt;
+  int sum;
+};
+
 
 template<typename RAIter>
 int contigSum(RAIter first, RAIter last)
@@ -34,6 +50,7 @@ int contigSum(RAIter first, RAIter last)
   return gcs.gcs;
 }
 
+// recursively calculate ABCD values
 template<typename RAIter>
 seqValues contigSumRecurse(RAIter first, RAIter last)
 {
@@ -95,6 +112,7 @@ seqValues contigSumRecurse(RAIter first, RAIter last)
 
   return seq;
 }
+
 
 template<typename RAIter>
 int sumOfSequence(RAIter first, RAIter last)
