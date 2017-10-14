@@ -68,21 +68,16 @@ void stableMerge(RAIter first, RAIter last, size_t & inversions)
 
   while(left < middle && right < last)
   {
-    if(*left < *right)
+    if(*right < *left)
     {
-      *output = *left;
-      //inversions += distance(left, right);
-      advance(left, 1);
+      *output = *right;
+      inversions += distance(left, middle);
+      advance(right, 1);
     }
     else
     {
-      *output = *right;
-      // if(*right < *left)
-      //   inversions += distance(left, middle);
-      for(auto i = left; i < middle; i++)
-        if(*right < *i)
-          inversions++;
-      advance(right, 1);
+      *output = *left;
+      advance(left, 1);
     }
     advance(output, 1);
   }
@@ -91,31 +86,5 @@ void stableMerge(RAIter first, RAIter last, size_t & inversions)
   copy(right, last, output);
 
   copy(buffer.begin(), buffer.end(), first);
-
-  // while(output < buffer.end())
-  // {
-  //   if(left < middle && (*left < *right || right == last ))
-  //   {
-  //     *output = *left;
-  //     if(*(right-1) < *left)
-  //       for(auto i = right-1; i > middle; i--)
-  //         if(*left < *i)
-  //           inversions--;
-  //     advance(left, 1);
-  //   }
-  //   else
-  //   {
-  //     *output = *right;
-  //     if(*right < *left)
-  //       inversions += distance(left, middle);
-  //     // for(auto i = left; i < middle; i++)
-  //     //   if(*right < *i)
-  //     //     inversions++;
-  //     advance(right, 1);
-  //   }
-  //   advance(output, 1);
-  // }
-  //
-  // copy(buffer.begin(), buffer.end(), first);
 
 }
