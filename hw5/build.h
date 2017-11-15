@@ -6,7 +6,7 @@
 	HW 5
   11/15/2017
 	Dynamic Programming Algorithm Demo
-	Finds max toll from all possible configurations of bridges
+	Finds max toll from best possible configuration of bridges
   Passes all tests of build_test2.cpp
 */
 #pragma once

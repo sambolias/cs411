@@ -10,12 +10,24 @@
 
 #include "build.h"
 
-//  *** Global Functions ***
+//  *** Global Function ***
 
 int build(int w, int e, const vector<Bridge> & bridges)
 {
   BridgeBuilder b(w, e, bridges);
   return b.getMaxToll();
+}
+
+//  *** BridgeBuilder class ***
+
+//ctor
+//object holds max toll after it is constructed
+BridgeBuilder::BridgeBuilder(int w, int e, const vector<Bridge> & b) : westCities(w),
+                                                                       eastCities(e),
+                                                                       maxToll(0)
+{
+  buildMatrix(b);
+  calculateMaxToll();
 }
 
 
@@ -34,14 +46,7 @@ void BridgeBuilder::buildMatrix(const vector<Bridge> & b)
 
 }
 
-BridgeBuilder::BridgeBuilder(int w, int e, const vector<Bridge> & b) : westCities(w),
-                                                                       eastCities(e),
-                                                                       maxToll(0)
-{
-  buildMatrix(b);
-  calculateMaxToll();
-}
-
+//finds max toll using dynamic programming algorithm
 void BridgeBuilder::calculateMaxToll()
 {
   //init matrix with 0s
@@ -65,6 +70,7 @@ void BridgeBuilder::calculateMaxToll()
     }
   }
 }
+
 
 int BridgeBuilder::getMaxToll()
 {
