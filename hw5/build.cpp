@@ -76,6 +76,8 @@ void BridgeBuilder::calculateMaxToll()
                     );
         maximum = tollMatrix[w][e] + maximum;
         maxTollMatrix[w][e] = maximum;
+        //gives same output
+      //  maxTollMatrix[w][e] = max(max(maxInRange[w], maxInDomain[e]), maximum);
 
         maxInRange[w] = max(maxInRange[w], maximum);
         //maxInRange[w] = max((w>0) ? maxInRange[w-1] : 0, max(maxInRange[w], maximum));
