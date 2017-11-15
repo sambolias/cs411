@@ -3,8 +3,8 @@
 	Sam Erie
 	serie@alaska.edu
 	CS 411
-	HW 2
-	Exhaustive Search Algorithm Demo
+	HW 5
+	Dynamic Programming Algorithm Demo
 	Function definitions for build.h
 */
 
@@ -22,7 +22,7 @@ int build(int w, int e, const vector<Bridge> & bridges)
 //builds a weighted adj matrix of bridge tolls
 void BridgeBuilder::buildMatrix(const vector<Bridge> & b)
 {
-  //init tollMatrix to -1
+  //init tollMatrix with 0s
   tollMatrix = vector<vector<int>>(westCities, vector<int>(eastCities, 0));
   for(auto bridge : b)
   {
@@ -44,9 +44,8 @@ BridgeBuilder::BridgeBuilder(int w, int e, const vector<Bridge> & b) : westCitie
 
 void BridgeBuilder::calculateMaxToll()
 {
-
   //init matrix with 0s
-  maxTollMatrix = vector<vector<int>>(westCities, vector<int>(eastCities, 0));
+  auto maxTollMatrix = vector<vector<int>>(westCities, vector<int>(eastCities, 0));
 
   //dynamically calculate the maximum toll
   for(int w = 0; w < westCities; w++)
@@ -63,7 +62,6 @@ void BridgeBuilder::calculateMaxToll()
 
         //keep track of overall maximum toll
         maxToll = max(maxToll, maximum);
-
     }
   }
 }

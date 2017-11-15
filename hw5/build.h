@@ -3,16 +3,15 @@
 	Sam Erie
 	serie@alaska.edu
 	CS 411
-	HW 2
-	Exhaustive Search Algorithm Demo
+	HW 5
+  11/15/2017
+	Dynamic Programming Algorithm Demo
 	Finds max toll from all possible configurations of bridges
-  Passes all tests of build_test.cpp
+  Passes all tests of build_test2.cpp
 */
 #pragma once
 
-#include<iostream>
-using std::cout;
-#include<utility>
+#include<algorithm>
 using std::max;
 #include <vector>
 using std::vector;
@@ -29,16 +28,13 @@ class BridgeBuilder
 private:
   int westCities, eastCities;
   int maxToll;
-  vector<vector<int>> maxTollMatrix;
+
   vector<vector<int>> tollMatrix; //tollMatrix[w][e]
 
   void buildMatrix(const vector<Bridge> & b);
   void calculateMaxToll();
 
-
 public:
-
   BridgeBuilder(int w, int e, const vector<Bridge> & b);
-
   int getMaxToll();
 };
