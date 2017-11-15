@@ -55,8 +55,6 @@ void BridgeBuilder::calculateMaxToll()
     {
         //store maximum previous bridges that can be added to toll
         int maximum = (w>0 && e>0) ? maxTollMatrix[w-1][e-1] : 0;
-        maximum = max(maximum, (w>0 && e-1>0) ? maxTollMatrix[w-1][e-2] : 0);
-        maximum = max(maximum, (w-1>0 && e>0) ? maxTollMatrix[w-2][e-1] : 0);
         maximum = tollMatrix[w][e] + maximum;
         //or if row directly above or directly to left is bigger store it
         maximum = max(maximum, (w>0) ? maxTollMatrix[w-1][e] : 0);
