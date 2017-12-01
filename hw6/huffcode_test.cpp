@@ -484,12 +484,17 @@ bool matchPattern(const std::string & pattern,
 // Does not throw (No-Throw Guarantee)
 void test_HuffCode_types(Tester & t)
 {
+
     std::cout << "Test Suite: class HuffCode - type checking"
               << std::endl;
 
+
     HuffCode h;
+
     const std::unordered_map<char, int> cw;
+
     h.setWeights(cw);
+
     const HuffCode & ch(h);
 
     // Return type of encode
@@ -902,5 +907,3 @@ int main()
 
     return 0;
 }
-
-

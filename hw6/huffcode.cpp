@@ -26,177 +26,123 @@ using std::pair;
 #include <vector>
 using std::vector;
 
-//makes stupid tree, not huffman code
-// void HuffCode::setWeights(const unordered_map<char, int> & theweights)
-// {
-//   //put weighted chars in priority_queue
-//   //sorted descending by weight
-//   auto comp = [](pair<char,int> a, pair<char,int> b){return a.second < b.second;};
-//   priority_queue<pair<char,int>, vector<pair<char,int>>, decltype(comp)> q(theweights.begin(),
-//                                                     theweights.end(), comp);
-//
-//   string enc = "";
-//   head = make_shared<EncodingNode>();
-//   auto node = head;
-//   auto next = make_shared<EncodingNode> ();
-//
-//   while(!q.empty())
-//   {
-//   //  std::cout<<q.top().first<<" "<<q.top().second<<"\n";
-//     char c = q.top().first;
-//     string v(1, c);
-//   // std::cout<<v<<"\n";
-//     q.pop();
-//     if(q.empty())
-//     {
-//       node->value = v;
-//       node->isGood = true;
-//       node->isLeaf = true;
-//     //  node = make_shared<EncodingNode>(v);
-//       //node = EncodingNode(v);
-//       encodings[c] = enc;
-//       std::cout<<v<<" "<<encodings[c]<<"\n";
-//     }
-//     else
-//     {
-//     //  *node = make_shared<EncodingNode>(next, EncodingNode(v));
-//   //  node = EncodingNode(next, EncodingNode(v));
-//       node->left = next;
-//       node->right = make_shared<EncodingNode>(v);
-//       node->isGood = true;
-//       node->isLeaf = false;
-//       encodings[c] = enc+"1";
-//       std::cout<<v<<" "<<encodings[c]<<"\n";
-//       node = node->left;
-//       next = make_shared<EncodingNode> ();
-//       enc += "0";
-//     }
-//
-//   }
-//
-// }
-
-//this doesn't work either...
+//builds EncodingNode tree and encodings map
 void HuffCode::setWeights(const unordered_map<char, int> & theweights)
 {
-  //put weighted chars in priority_queue
-  //sorted descending by weight
-  auto comp = [](pair<char,int> a, pair<char,int> b){return a.second > b.second;};
-  priority_queue<pair<char,int>, vector<pair<char,int>>, decltype(comp)> q(theweights.begin(),
-                                                    theweights.end(), comp);
+  //populate vector of leaf nodes
+  vector<shared_ptr<EncodingNode>> nodes;
+  for(auto leaf : theweights)
+    nodes.push_back(make_shared<EncodingNode>(leaf));
 
-  string enc = "";
-  head = make_shared<EncodingNode>();
-  auto left = make_shared<EncodingNode> ();
-  auto right = make_shared<EncodingNode> ();
-  auto root = make_shared<EncodingNode>(left, right);
+  //put EncodingNodes in priority_queue
+  //sorted descending by weight of root (combined weight of leaves)
+  auto comp = [](const shared_ptr<EncodingNode> &a,
+                 const shared_ptr<EncodingNode> &b)
+                 {return a->weight > b->weight;};
+  priority_queue<shared_ptr<EncodingNode>, vector<shared_ptr<EncodingNode>>,
+                                           decltype(comp)> q(nodes.begin(),
+                                           nodes.end(), comp);
 
-  while(!q.empty())
+  //don't try to build from empty priority_queue
+  if(q.size() == 0)
   {
-    char c = q.top().first;
-    string v(1, c);
+    return;
+  }
+
+  //build tree from priority_queue
+  //take two lowest weight nodes and attach them to new root
+  //then place new root in priority_queue
+  while(q.size() > 1)
+  {
+    auto left = q.top();
+    q.pop();
+    auto right = q.top();
     q.pop();
 
-    if(q.empty())
-    {
-      head = root;
-    }
-    else
-    {
-      if(!left->isGood)
-      {
-        left = make_shared<EncodingNode>(v);
-        encodings[c] = enc+"0";
-        std::cout<<v<<" "<<encodings[c]<<"\n";
-      }
-      else if(!right->isGood)
-      {
-        right = make_shared<EncodingNode>(v);
-        encodings[c] = enc+"1";
-        std::cout<<v<<" "<<encodings[c]<<"\n";
-      }
-      else
-      {
-        root = make_shared<EncodingNode>(left, right);
-        left = make_shared<EncodingNode> (root, EncodingNode(v));
-        enc += "0";
-        encodings[c] = enc+"1";
-        right = make_shared<EncodingNode> ();
-
-      }
-
-    }
-
+    auto root = make_shared<EncodingNode>();
+    root->attachLeft(left);
+    root->attachRight(right);
+    q.push(root);
   }
+
+//set head to tree root
+  head = q.top();
+//recursively map all leaf encodings
+  mapEncodings(head, "");
 
 }
 
+//recursively tracks encoding up to leaf then stores in encodings map
+void HuffCode::mapEncodings(const shared_ptr<EncodingNode> & node, string encoding)
+{
+  if(node->isLeaf)
+    encodings[node->value[0]] = encoding;
+  else
+  {
+    if(node->left != NULL)
+      mapEncodings(node->left, encoding + "0");
+
+    if(node->right != NULL)
+      mapEncodings(node->right, encoding + "1");
+  }
+}
+
+//encodings saved in map encodings
 string HuffCode::encode(const string & text) const
 {
     string word;
-    // if(head == NULL || !head->isGood)
-    // {
-    //   std::cout<<"what the fuck\n";
-    // }
-    std::cout<<"given: ";
+
     for(auto c : text)
     {
-      std::cout<<c;
       word += encodings.at(c);
     }
-    std::cout<<"\nreturned: "<<word<<"\n";
-    return word;  // DUMMY RETURN
+
+    return word;
 }
 
-
+//traverse tree of EncodingNodes
 string HuffCode::decode(const string & codestr) const
 {
+
   string word;
-  // if(head == NULL || !head->isGood)
-  // {
-  //   std::cout<<"what the fuck\n";
-  //   return "";
-  // }
+
   auto curr = head;
   for(auto b : codestr)
   {
-    // std::cout<<b;
-    // if(!curr->isLeaf)
-    // {
-      if(b == '0')
-        curr = curr->left;
-      else
-        curr = curr->right;
-    //}
+
+    if(b == '0')
+      curr = curr->left;
+    else
+      curr = curr->right;
 
     if(curr->isLeaf)
     {
-      // std::cout<<"hi";
-      // std::cout<<curr->value;
       word += curr->value;
       curr = head;
     }
 
   }
-    return word;  // DUMMY RETURN
+    return word;
 }
 
-EncodingNode::EncodingNode(const EncodingNode &_left, const EncodingNode &_right) : isLeaf(false), isGood(true)
-{
-  left = make_shared<EncodingNode>(_left);
-  right = make_shared<EncodingNode>(_right);
-}
-EncodingNode::EncodingNode(shared_ptr<EncodingNode> _left, shared_ptr<EncodingNode> _right) : isLeaf(false), isGood(true)
-{
-  left = _left;
-  right = _right;
-}
-EncodingNode::EncodingNode(shared_ptr<EncodingNode> _left, const EncodingNode& _right) : isLeaf(false), isGood(true)
-{
-  left = _left;
-  right = make_shared<EncodingNode>(_right);
-}
-EncodingNode::EncodingNode(string _value) : value(_value), isLeaf(true), isGood(true)
+
+// *** EncodingNode Struct Definitions **
+
+//ctors
+EncodingNode::EncodingNode(pair<char,int> node) : value(string(1,node.first)), weight(node.second), isLeaf(true)
 {}
-EncodingNode::EncodingNode() : isGood(false)
+EncodingNode::EncodingNode() : weight(0), isLeaf(false)
 {}
+
+//functions
+void EncodingNode::attachLeft(const shared_ptr<EncodingNode> & node)
+{
+  left = node;
+  weight += node->weight;
+}
+
+void EncodingNode::attachRight(const shared_ptr<EncodingNode> & node)
+{
+  right = node;
+  weight += node->weight;
+}

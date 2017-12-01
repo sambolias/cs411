@@ -18,20 +18,22 @@
 #include <memory>
 #include <utility>
 
-class EncodingNode
+
+//nodes to build tree of encodings
+//weight is sum of all subtrees/leaves
+struct EncodingNode
 {
-public:
   std::shared_ptr<EncodingNode> left;
   std::shared_ptr<EncodingNode> right;
   bool isLeaf;
-  bool isGood;
+  int weight;
   std::string value;
 
   EncodingNode();
-  EncodingNode(const EncodingNode &_left, const EncodingNode &_right);
-  EncodingNode(std::shared_ptr<EncodingNode> _left, std::shared_ptr<EncodingNode> _right);
-  EncodingNode(std::shared_ptr<EncodingNode> _left, const EncodingNode& _right);
-  EncodingNode(std::string _value);
+  EncodingNode(std::pair<char,int> node);
+
+  void attachLeft(const std::shared_ptr<EncodingNode> & node);
+  void attachRight(const std::shared_ptr<EncodingNode> & node);
 };
 
 // Class HuffCode
@@ -47,6 +49,8 @@ public:
 public:
 
     void setWeights(const std::unordered_map<char, int> & theweights);
+
+    void mapEncodings(const std::shared_ptr<EncodingNode> & node, std::string encoding);
 
     std::string encode(const std::string & text) const;
 
