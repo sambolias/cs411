@@ -26,56 +26,110 @@ using std::pair;
 #include <vector>
 using std::vector;
 
+//makes stupid tree, not huffman code
+// void HuffCode::setWeights(const unordered_map<char, int> & theweights)
+// {
+//   //put weighted chars in priority_queue
+//   //sorted descending by weight
+//   auto comp = [](pair<char,int> a, pair<char,int> b){return a.second < b.second;};
+//   priority_queue<pair<char,int>, vector<pair<char,int>>, decltype(comp)> q(theweights.begin(),
+//                                                     theweights.end(), comp);
+//
+//   string enc = "";
+//   head = make_shared<EncodingNode>();
+//   auto node = head;
+//   auto next = make_shared<EncodingNode> ();
+//
+//   while(!q.empty())
+//   {
+//   //  std::cout<<q.top().first<<" "<<q.top().second<<"\n";
+//     char c = q.top().first;
+//     string v(1, c);
+//   // std::cout<<v<<"\n";
+//     q.pop();
+//     if(q.empty())
+//     {
+//       node->value = v;
+//       node->isGood = true;
+//       node->isLeaf = true;
+//     //  node = make_shared<EncodingNode>(v);
+//       //node = EncodingNode(v);
+//       encodings[c] = enc;
+//       std::cout<<v<<" "<<encodings[c]<<"\n";
+//     }
+//     else
+//     {
+//     //  *node = make_shared<EncodingNode>(next, EncodingNode(v));
+//   //  node = EncodingNode(next, EncodingNode(v));
+//       node->left = next;
+//       node->right = make_shared<EncodingNode>(v);
+//       node->isGood = true;
+//       node->isLeaf = false;
+//       encodings[c] = enc+"1";
+//       std::cout<<v<<" "<<encodings[c]<<"\n";
+//       node = node->left;
+//       next = make_shared<EncodingNode> ();
+//       enc += "0";
+//     }
+//
+//   }
+//
+// }
 
+//this doesn't work either...
 void HuffCode::setWeights(const unordered_map<char, int> & theweights)
 {
   //put weighted chars in priority_queue
   //sorted descending by weight
-  auto comp = [](pair<char,int> a, pair<char,int> b){return a.second < b.second;};
+  auto comp = [](pair<char,int> a, pair<char,int> b){return a.second > b.second;};
   priority_queue<pair<char,int>, vector<pair<char,int>>, decltype(comp)> q(theweights.begin(),
                                                     theweights.end(), comp);
 
   string enc = "";
   head = make_shared<EncodingNode>();
-  auto node = head;
-  auto next = make_shared<EncodingNode> ();
+  auto left = make_shared<EncodingNode> ();
+  auto right = make_shared<EncodingNode> ();
+  auto root = make_shared<EncodingNode>(left, right);
 
   while(!q.empty())
   {
-  //  std::cout<<q.top().first<<" "<<q.top().second<<"\n";
     char c = q.top().first;
     string v(1, c);
-  // std::cout<<v<<"\n";
     q.pop();
+
     if(q.empty())
     {
-      node->value = v;
-      node->isGood = true;
-      node->isLeaf = true;
-    //  node = make_shared<EncodingNode>(v);
-      //node = EncodingNode(v);
-      encodings[c] = enc;
-      std::cout<<v<<" "<<encodings[c]<<"\n";
+      head = root;
     }
     else
     {
-    //  *node = make_shared<EncodingNode>(next, EncodingNode(v));
-  //  node = EncodingNode(next, EncodingNode(v));
-      node->left = next;
-      node->right = make_shared<EncodingNode>(v);
-      node->isGood = true;
-      node->isLeaf = false;
-      encodings[c] = enc+"1";
-      std::cout<<v<<" "<<encodings[c]<<"\n";
-      node = node->left;
-      next = make_shared<EncodingNode> ();
-      enc += "0";
+      if(!left->isGood)
+      {
+        left = make_shared<EncodingNode>(v);
+        encodings[c] = enc+"0";
+        std::cout<<v<<" "<<encodings[c]<<"\n";
+      }
+      else if(!right->isGood)
+      {
+        right = make_shared<EncodingNode>(v);
+        encodings[c] = enc+"1";
+        std::cout<<v<<" "<<encodings[c]<<"\n";
+      }
+      else
+      {
+        root = make_shared<EncodingNode>(left, right);
+        left = make_shared<EncodingNode> (root, EncodingNode(v));
+        enc += "0";
+        encodings[c] = enc+"1";
+        right = make_shared<EncodingNode> ();
+
+      }
+
     }
 
   }
 
 }
-
 
 string HuffCode::encode(const string & text) const
 {
