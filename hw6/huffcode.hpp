@@ -1,7 +1,11 @@
-// huffcode.hpp  UNFINISHED
-// Glenn G. Chappell
-// 29 Nov 2015
+// huffcode.hpp
+// Sam Erie
+// 11/30/17
+// CS 411
+// Hartman
+// hw6
 //
+// Based on template from:
 // For CS 411/611 Fall 2015
 // Assignment 6, Exercise A
 // Header for class HuffCode
