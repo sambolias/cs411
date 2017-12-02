@@ -52,7 +52,7 @@ void HuffCode::setWeights(const unordered_map<char, int> & theweights)
     nodes.push_back(make_shared<EncodingNode>(leaf));
 
   //put EncodingNodes in priority_queue
-  //sorted descending by weight of root (combined weight of leaves)
+  //sorted in ascending order by weight of root (combined weight of leaves)
   auto comp = [](const shared_ptr<EncodingNode> &a,
                  const shared_ptr<EncodingNode> &b)
                  {return a->weight > b->weight;};
@@ -83,7 +83,7 @@ void HuffCode::setWeights(const unordered_map<char, int> & theweights)
 }
 
 //recursively tracks encoding up to leaf then stores in encodings map
-//node must not be NULL
+//precondition node must not be NULL
 void HuffCode::mapEncodings(const shared_ptr<EncodingNode> & node, string encoding)
 {
   if(node->isLeaf)
@@ -115,6 +115,7 @@ string HuffCode::encode(const string & text) const
 
 //traverse tree of EncodingNodes
 //precondition head must be initialized
+//tree must contain desired leaf
 string HuffCode::decode(const string & codestr) const
 {
   string word;
